@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ecommerce.repository.OrderItemMapper">
+
+    <resultMap id="orderItemMap" type="com.ecommerce.domain.OrderItem">
+        <id property="id" column="id"/>
+        <result property="orderId" column="order_id"/>
+        <result property="productId" column="product_id"/>
+        <result property="productName" column="product_name"/>
+        <result property="quantity" column="quantity"/>
+        <result property="price" column="price"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.ecommerce.domain.OrderItem" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO order_item (order_id, product_id, product_name, quantity, price)
+        VALUES (#{orderId}, #{productId}, #{productName}, #{quantity}, #{price})
+    </insert>
+
+    <insert id="insertBatch" parameterType="java.util.List">
+        INSERT INTO order_item (order_id, product_id, product_name, quantity, price)
+        VALUES
+        <foreach collection="items" item="item" separator=",">
+            (#{item.orderId}, #{item.productId}, #{item.productName}, #{item.quantity}, #{item.price})
+        </foreach>
+    </insert>
+
+    <select id="findByOrderId" resultMap="orderItemMap">
+        SELECT * FROM order_item WHERE order_id = #{orderId}
+    </select>
+</mapper>

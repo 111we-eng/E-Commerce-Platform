@@ -1,0 +1,4 @@
+spring:
+  datasource:
+    url: jdbc:sqlite:ecommerce.db?date_string_format=yyyy-MM-dd HH:mm:ss
+    driver-class-name: org.sqlite.JDBC

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ecommerce.repository.UserMapper">
+
+    <resultMap id="userMap" type="com.ecommerce.domain.User">
+        <id property="id" column="id"/>
+        <result property="username" column="username"/>
+        <result property="password" column="password"/>
+        <result property="phone" column="phone"/>
+        <result property="email" column="email"/>
+        <result property="address" column="address"/>
+        <result property="role" column="role"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <select id="findByUsername" resultMap="userMap">
+        SELECT * FROM user WHERE username = #{username}
+    </select>
+
+    <select id="findById" resultMap="userMap">
+        SELECT * FROM user WHERE id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.ecommerce.domain.User" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user (username, password, phone, email, address, role)
+        VALUES (#{username}, #{password}, #{phone}, #{email}, #{address}, #{role})
+    </insert>
+
+    <update id="update" parameterType="com.ecommerce.domain.User">
+        UPDATE user
+        <set>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="address != null">address = #{address},</if>
+            update_time = CURRENT_TIMESTAMP
+        </set>
+        WHERE id = #{id}
+    </update>
+</mapper>
