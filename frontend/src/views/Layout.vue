@@ -10,6 +10,7 @@
         <el-menu-item index="/cart" v-if="isLogin">购物车</el-menu-item>
         <el-menu-item index="/orders" v-if="isLogin">我的订单</el-menu-item>
         <el-menu-item index="/profile" v-if="isLogin">个人中心</el-menu-item>
+        <el-menu-item index="/api-test">🧪 API测试</el-menu-item>
       </el-menu>
       <div class="user-area">
         <template v-if="isLogin">

@@ -69,6 +69,12 @@ const routes = [
         name: 'Profile',
         component: () => import('../views/Profile.vue'),
         meta: { title: '个人中心', requiresAuth: true }
+      },
+      {
+        path: 'api-test',
+        name: 'ApiTest',
+        component: () => import('../views/ApiTest.vue'),
+        meta: { title: 'API测试', requiresAuth: false }
       }
     ]
   }
