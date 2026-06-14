@@ -103,6 +103,95 @@ const allProducts = [
 // 提取所有分类
 const allCategories = [...new Set(allProducts.map(p => p.category))]
 
+// ===================== 促销数据配置 =====================
+
+/**
+ * 促销配置映射：productId → promotion 对象
+ * 不同类型的促销覆盖多种场景，用于测试 PromotionTag + CountdownTimer
+ */
+const promotionConfig = {
+  // 1号商品 — 限时折扣 + 倒计时（6月20日结束）
+  1: {
+    type: 'DISCOUNT',
+    text: '618年中大促',
+    discountRate: 0.85,
+    originalPrice: 14999.00,
+    endTime: '2026-06-20T23:59:59'
+  },
+  // 2号商品 — 秒杀 + 倒计时（当天24点结束）
+  2: {
+    type: 'FLASH_SALE',
+    text: '超级秒杀',
+    discountRate: 0.70,
+    originalPrice: 8999.00,
+    endTime: getMidnightTimestamp()  // 当天 23:59:59
+  },
+  // 4号商品 — 新品上市（无倒计时）
+  4: {
+    type: 'NEW_ARRIVAL',
+    text: '新品首发',
+    discountRate: 0,
+    originalPrice: 0,
+    endTime: ''
+  },
+  // 7号商品 — 买赠活动 + 倒计时
+  7: {
+    type: 'GIFT',
+    text: '买一送一',
+    discountRate: 0,
+    originalPrice: 0,
+    endTime: '2026-06-18T18:00:00'
+  },
+  // 11号商品 — 限时折扣
+  11: {
+    type: 'DISCOUNT',
+    text: '周末特惠',
+    discountRate: 0.75,
+    originalPrice: 899.00,
+    endTime: '2026-06-16T23:59:59'
+  },
+  // 16号商品 — 秒杀
+  16: {
+    type: 'FLASH_SALE',
+    text: '限时秒杀',
+    discountRate: 0.65,
+    originalPrice: 4799.00,
+    endTime: '2026-06-15T12:00:00'
+  },
+  // 26号商品 — 折扣
+  26: {
+    type: 'DISCOUNT',
+    text: '首发优惠',
+    discountRate: 0.90,
+    originalPrice: 9999.00,
+    endTime: '2026-06-25T23:59:59'
+  }
+}
+
+/** 获取当天 23:59:59 的时间字符串 */
+function getMidnightTimestamp() {
+  const now = new Date()
+  now.setHours(23, 59, 59, 999)
+  // 返回 ISO 格式字符串
+  const y = now.getFullYear()
+  const m = String(now.getMonth() + 1).padStart(2, '0')
+  const d = String(now.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d}T23:59:59`
+}
+
+/**
+ * 为商品附加促销信息
+ */
+function attachPromotion(product) {
+  const config = promotionConfig[product.id]
+  if (config) {
+    product.promotion = { ...config }
+  } else {
+    product.promotion = { type: 'NONE', text: '', discountRate: 0, originalPrice: 0, endTime: '' }
+  }
+  return product
+}
+
 // ===================== Mock API =====================
 
 /**
@@ -149,7 +238,7 @@ export async function mockProductPage(params = {}) {
   const pages  = Math.ceil(total / pageSize)
   const start  = (page - 1) * pageSize
   const end    = start + pageSize
-  const records = filtered.slice(start, end)
+  const records = filtered.slice(start, end).map(p => attachPromotion({ ...p }))
 
   console.log(
     `[Mock] GET /api/products?page=${page}&pageSize=${pageSize}` +
@@ -177,13 +266,15 @@ export async function mockProductSearch(keyword, page = 1, pageSize = 8) {
 }
 
 /**
- * Mock: 商品详情
+ * Mock: 商品详情（含促销信息）
  */
 export async function mockProductDetail(id) {
   await simulateDelay()
   const product = allProducts.find(p => p.id === parseInt(id))
   if (!product) return { code: 404, message: '商品不存在', data: null }
-  return { code: 200, message: '操作成功', data: product }
+  // 附加促销信息
+  const enriched = attachPromotion({ ...product })
+  return { code: 200, message: '操作成功', data: enriched }
 }
 
 /**
